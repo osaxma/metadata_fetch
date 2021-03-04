@@ -11,8 +11,8 @@ import 'package:test/test.dart';
 void main() {
   test('JSON Serialization', () async {
     var url = 'https://flutter.dev';
-    var response = await http.get(url);
-    var document = responseToDocument(response);
+    var response = await http.get(Uri.parse(url));
+    var document = MetaDataFetcher.responseToDocument(response);
     var data = MetadataParser.parse(document);
     print(data.toJson());
     expect(data.toJson().isNotEmpty, true);
@@ -20,8 +20,8 @@ void main() {
 
   test('Metadata Parser', () async {
     var url = 'https://flutter.dev';
-    var response = await http.get(url);
-    var document = responseToDocument(response);
+    var response = await http.get(Uri.parse(url));
+    var document = MetaDataFetcher.responseToDocument(response);
 
     var data = MetadataParser.parse(document);
     print(data);
@@ -44,8 +44,8 @@ void main() {
   group('Metadata parsers', () {
     test('JSONLD', () async {
       var url = 'https://www.epicurious.com/';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       // print(response.statusCode);
 
       print(JsonLdParser(document));
@@ -54,8 +54,8 @@ void main() {
     test('JSONLD II', () async {
       var url =
           'https://www.epicurious.com/expert-advice/best-soy-sauce-chefs-pick-article';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       // print(response.statusCode);
 
       print(JsonLdParser(document));
@@ -64,8 +64,8 @@ void main() {
     test('JSONLD III', () async {
       var url =
           'https://medium.com/@quicky316/install-flutter-sdk-on-windows-without-android-studio-102fdf567ce4';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       // print(response.statusCode);
 
       print(JsonLdParser(document));
@@ -73,16 +73,16 @@ void main() {
 
     test('JSONLD IV', () async {
       var url = 'https://www.distilled.net/';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       // print(response.statusCode);
 
       print(JsonLdParser(document));
     });
     test('HTML', () async {
       var url = 'https://flutter.dev';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       print(response.statusCode);
 
       print(HtmlMetaParser(document).title);
@@ -92,8 +92,8 @@ void main() {
 
     test('OpenGraph Parser', () async {
       var url = 'https://flutter.dev';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       print(response.statusCode);
 
       print(OpenGraphParser(document));
@@ -104,8 +104,8 @@ void main() {
 
     test('OpenGraph Youtube Test', () async {
       String url = 'https://www.youtube.com/watch?v=0jz0GAFNNIo';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       print(OpenGraphParser(document));
       print(OpenGraphParser(document).title);
       Metadata data = OpenGraphParser(document).parse();
@@ -116,8 +116,8 @@ void main() {
     test('TwitterCard Parser', () async {
       var url =
           'https://www.epicurious.com/expert-advice/best-soy-sauce-chefs-pick-article';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       print(response.statusCode);
 
       print(TwitterCardParser(document));
@@ -130,8 +130,8 @@ void main() {
 
     test('Faulty', () async {
       var url = 'https://google.ca';
-      var response = await http.get(url);
-      var document = responseToDocument(response);
+      var response = await http.get(Uri.parse(url));
+      var document = MetaDataFetcher.responseToDocument(response);
       print(response.statusCode);
 
       print(OpenGraphParser(document).title);
@@ -146,36 +146,36 @@ void main() {
 
   group('extract()', () {
     test('First Test', () async {
-      var data = await extract('https://flutter.dev/');
+      var data = await (MetaDataFetcher.extract('https://flutter.dev/'));
       print(data);
-      print(data.description);
-      expect(data.toMap().isEmpty, false);
+      print(data?.description);
+      expect(data?.toMap().isEmpty, false);
     });
 
     test('FB Test', () async {
-      var data = await extract('https://facebook.com/');
-      expect(data.toMap().isEmpty, false);
+      var data = await (MetaDataFetcher.extract('https://facebook.com/'));
+      expect(data?.toMap().isEmpty, false);
     });
 
     test('Youtube Test', () async {
-      Metadata data = await extract('https://www.youtube.com/watch?v=0jz0GAFNNIo');
-      expect(data.title, 'Drake - When To Say When & Chicago Freestyle');
-      expect(data.image, 'https://i.ytimg.com/vi/0jz0GAFNNIo/maxresdefault.jpg');
+      var data = await (MetaDataFetcher.extract('https://www.youtube.com/watch?v=0jz0GAFNNIo'));
+      expect(data?.title, 'Drake - When To Say When & Chicago Freestyle');
+      expect(data?.image, 'https://i.ytimg.com/vi/0jz0GAFNNIo/maxresdefault.jpg');
     });
 
     test('Unicode Test', () async {
-      var data = await extract('https://www.jpf.go.jp/');
-      expect(data.toMap().isEmpty, false);
+      var data = await (MetaDataFetcher.extract('https://www.jpf.go.jp/'));
+      expect(data?.toMap().isEmpty, false);
     });
 
     test('Gooogle Test', () async {
-      var data = await extract('https://google.ca');
-      expect(data.toMap().isEmpty, false);
-      expect(data.title, 'google');
+      var data = await (MetaDataFetcher.extract('https://google.ca'));
+      expect(data?.toMap().isEmpty, false);
+      expect(data?.title, 'google');
     });
 
     test('Invalid Url Test', () async {
-      var data = await extract('https://google');
+      var data = await MetaDataFetcher.extract('https://google');
       expect(data == null, true);
     });
 
